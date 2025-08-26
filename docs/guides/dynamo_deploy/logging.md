@@ -2,7 +2,8 @@
 
 This guide demonstrates how to set up logging for Dynamo in Kubernetes using Grafana Loki and Alloy. This setup provides a simple reference logging setup that can be followed in Kubernetes clusters including Minikube and MicroK8s. 
 
-> ⚠️ Note: This setup is intended for development and testing purposes. For production environments, please refer to the official documentation for high-availability configurations.
+> [!Note]
+> This setup is intended for development and testing purposes. For production environments, please refer to the official documentation for high-availability configurations.
 
 ## Components Overview
 
@@ -14,11 +15,17 @@ This guide demonstrates how to set up logging for Dynamo in Kubernetes using Gra
 
 ## Prerequisites
 
-1. This guide assumes you have installed Dynamo Cloud Kubernetes Operator. For more information, see [Dynamo Cloud Operator](./README.md).
+### 1. Dynamo Cloud Kubernetes Operator
 
-2. Prometheus Operator installed. While this guide does not use Prometheus, it assumes Grafana is pre-installed with the Prometheus Operator. For more information, see [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator).
+This guide assumes you have installed Dynamo Cloud Kubernetes Operator. For more information, see [Dynamo Cloud Operator](./README.md).
 
-3. The following env variables are set:
+### 2. Kube-prometheus
+
+While this guide does not use Prometheus, it assumes Grafana is pre-installed with the kube-prometheus. For more information, see [kube-prometheus](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack).
+
+### 3. Environment Variables
+
+The following env variables are set:
 - `MONITORING_NAMESPACE`: The namespace where Loki is installed
 - `DYNAMO_NAMESPACE`: The namespace where Dynamo Cloud Operator is installed
 
@@ -67,9 +74,9 @@ The values file (`alloy-values.yaml`) includes the following configurations for 
 
 ```yaml
 destinations:
-  - name: loki
-    type: loki
-    url: http://loki-gateway.$MONITORING_NAMESPACE.svc.cluster.local/loki/api/v1/push
+- name: loki
+  type: loki
+  url: http://loki-gateway.$MONITORING_NAMESPACE.svc.cluster.local/loki/api/v1/push
 podLogs:
   enabled: true
   gatherMethod: kubernetesApi # collect logs from the kubernetes api, rather than /var/log/containers/; friendly for testing and development
@@ -79,21 +86,20 @@ podLogs:
     nvidia_com_dynamo_component_type: nvidia.com/dynamo-component-type
     nvidia_com_dynamo_graph_deployment_name: nvidia.com/dynamo-graph-deployment-name
   labelsToKeep:
-    - "app_kubernetes_io_name"
-    - "container"
-    - "instance"
-    - "job"
-    - "level"
-    - "namespace"
-    - "service_name"
-    - "service_namespace"
-    - "deployment_environment"
-    - "deployment_environment_name"
-    - "nvidia_com_dynamo_component_type" # extract this label from the dynamo graph deployment
-    - "nvidia_com_dynamo_graph_deployment_name" # extract this label from the dynamo graph deployment`
-    - "app_kubernetes_io_part_of"
+  - "app_kubernetes_io_name"
+  - "container"
+  - "instance"
+  - "job"
+  - "level"
+  - "namespace"
+  - "service_name"
+  - "service_namespace"
+  - "deployment_environment"
+  - "deployment_environment_name"
+  - "nvidia_com_dynamo_component_type" # extract this label from the dynamo graph deployment
+  - "nvidia_com_dynamo_graph_deployment_name" # extract this label from the dynamo graph deployment
   namespaces:
-    - $DYNAMO_NAMESPACE 
+  - $DYNAMO_NAMESPACE
 ```
 
 ### 3. Configure Grafana with the Loki datasource and Dynamo Logs dashboard
@@ -110,7 +116,8 @@ envsubst < deploy/logging/grafana/loki-datasource.yaml | kubectl apply -n $MONIT
 envsubst < deploy/logging/grafana/logging-dashboard.yaml | kubectl apply -n $MONITORING_NAMESPACE -f -
 ```
 
-> ⚠️ Note: If using Grafana installed without the Prometheus Operator, you can manually import the Loki datasource and Dynamo Logs dashboard using the Grafana UI.
+> [!Note]
+> If using Grafana installed without the Prometheus Operator, you can manually import the Loki datasource and Dynamo Logs dashboard using the Grafana UI.
 
 ### 4. Deploy a DynamoGraphDeployment with JSONL Logging
 
@@ -129,7 +136,7 @@ Send a few chat completions requests to generate structured logs across the fron
 Port-forward the Grafana service to access the UI:
 
 ```bash
-kubectl port-forward svc/grafana 3000:80 -n $MONITORING_NAMESPACE
+kubectl port-forward svc/prometheus-grafana 3000:80 -n $MONITORING_NAMESPACE
 ```
 
 If everything is working, under Home > Dashboards > Dynamo Logs, you should see a dashboard that can be used to view the logs associated with our DynamoGraphDeployments

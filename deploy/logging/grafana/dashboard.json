@@ -56,7 +56,7 @@
             },
             "direction": "backward",
             "editorMode": "builder",
-            "expr": "{namespace=~\"$namespace\", app_kubernetes_io_part_of=~\"$dynamographdeployment\", nvidia_com_dynamo_component_type=~\"$component\"} |~ \"(?i)$search\" |~ \"(?i)$trace_id\"",
+            "expr": "{namespace=~\"$namespace\", nvidia_com_dynamo_graph_deployment_name=~\"$dynamographdeployment\", nvidia_com_dynamo_component_type=~\"$component\"} |~ \"(?i)$search\" |~ \"(?i)$trace_id\"",
             "queryType": "range",
             "refId": "A"
           }
@@ -123,14 +123,14 @@
             "type": "loki",
             "uid": "$datasource"
           },
-          "definition": "label_values(app_kubernetes_io_part_of)",
+          "definition": "label_values(nvidia_com_dynamo_graph_deployment_name)",
           "hide": 0,
           "includeAll": true,
           "label": "DynamoGraph Deployment",
           "multi": true,
           "name": "dynamographdeployment",
           "options": [],
-          "query": "label_values(app_kubernetes_io_part_of)",
+          "query": "label_values(nvidia_com_dynamo_graph_deployment_name)",
           "refresh": 1,
           "regex": "",
           "skipUrlSync": false,
