@@ -1,6 +1,6 @@
 # Log Aggregation in Dynamo on Kubernetes
 
-This guide demonstrates how to set up logging for Dynamo in Kubernetes using Grafana Loki and Alloy. This setup provides a simple reference logging setup that can be followed in Kubernetes clusters including Minikube and MicroK8s. 
+This guide demonstrates how to set up logging for Dynamo in Kubernetes using Grafana Loki and Alloy. This setup provides a simple reference logging setup that can be followed in Kubernetes clusters including Minikube and MicroK8s.
 
 > [!Note]
 > This setup is intended for development and testing purposes. For production environments, please refer to the official documentation for high-availability configurations.
@@ -125,6 +125,9 @@ At this point, we should have everything in place to collect and view logs in ou
 
 To enable structured logs in a DynamoGraphDeployment, we need to set the `DYN_LOGGING_JSONL` environment variable to `1`. This is done for us in the `agg_logging.yaml` setup for the Sglang backend. We can now deploy the DynamoGraphDeployment with:
 
+```bash
+kubectl apply -n $DYNAMO_NAMESPACE -f components/backends/sglang/deploy/agg_logging.yaml
+```
 
 Send a few chat completions requests to generate structured logs across the frontend and worker pods across the DynamoGraphDeployment. We are now all set to view the logs in Grafana.
 

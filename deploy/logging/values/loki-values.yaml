@@ -30,7 +30,7 @@ loki:
 
 minio:
   enabled: true
-      
+
 deploymentMode: SingleBinary
 singleBinary:
   replicas: 1
