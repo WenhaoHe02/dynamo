@@ -125,9 +125,6 @@ At this point, we should have everything in place to collect and view logs in ou
 
 To enable structured logs in a DynamoGraphDeployment, we need to set the `DYN_LOGGING_JSONL` environment variable to `1`. This is done for us in the `agg_logging.yaml` setup for the Sglang backend. We can now deploy the DynamoGraphDeployment with:
 
-```bash
-kubectl apply -n $DYNAMO_NAMESPACE -f deploy/logging/agg_logging.yaml # Deploy the DynamoGraphDeployment with JSONL logging enabled
-```
 
 Send a few chat completions requests to generate structured logs across the frontend and worker pods across the DynamoGraphDeployment. We are now all set to view the logs in Grafana.
 
