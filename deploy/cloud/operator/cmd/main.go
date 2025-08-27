@@ -173,6 +173,9 @@ func main() {
 			Enabled:          false, // Will be set after Grove discovery
 			TerminationDelay: groveTerminationDelay,
 		},
+		KaiScheduler: commonController.KaiSchedulerConfig{
+			Enabled: false, // Will be set after Kai-scheduler discovery
+		},
 		EtcdAddress: etcdAddr,
 		NatsAddress: natsAddr,
 		IngressConfig: commonController.IngressConfig{
@@ -244,6 +247,11 @@ func main() {
 	setupLog.Info("Detecting Grove availability...")
 	groveEnabled := commonController.DetectGroveAvailability(mainCtx, mgr)
 	ctrlConfig.Grove.Enabled = groveEnabled
+
+	// Detect Kai-scheduler availability using discovery client
+	setupLog.Info("Detecting Kai-scheduler availability...")
+	kaiSchedulerEnabled := commonController.DetectKaiSchedulerAvailability(mainCtx, mgr)
+	ctrlConfig.KaiScheduler.Enabled = kaiSchedulerEnabled
 
 	// Create etcd client
 	cli, err := clientv3.New(clientv3.Config{

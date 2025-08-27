@@ -37,11 +37,17 @@ type GroveConfig struct {
 	TerminationDelay time.Duration
 }
 
+type KaiSchedulerConfig struct {
+	// Enabled is automatically determined by checking if Kai-scheduler CRDs are installed in the cluster
+	Enabled bool
+}
+
 type Config struct {
 	// Enable resources filtering, only the resources belonging to the given namespace will be handled.
 	RestrictedNamespace string
 	EnableLWS           bool
 	Grove               GroveConfig
+	KaiScheduler        KaiSchedulerConfig
 	EtcdAddress         string
 	NatsAddress         string
 	IngressConfig       IngressConfig
@@ -92,6 +98,43 @@ func DetectGroveAvailability(ctx context.Context, mgr ctrl.Manager) bool {
 	}
 
 	logger.Info("Grove not available, grove.io API group not found")
+	return false
+}
+
+// DetectKaiSchedulerAvailability checks if Kai-scheduler is available by checking if the scheduling.run.ai API group is registered
+// This approach uses the discovery client which is simpler and more reliable
+func DetectKaiSchedulerAvailability(ctx context.Context, mgr ctrl.Manager) bool {
+	logger := log.FromContext(ctx)
+
+	// Use the discovery client to check if Kai-scheduler API groups are available
+	cfg := mgr.GetConfig()
+	if cfg == nil {
+		logger.Info("Kai-scheduler detection failed, no discovery client available")
+		return false
+	}
+
+	// Try to create a discovery client
+	discoveryClient, err := discovery.NewDiscoveryClientForConfig(cfg)
+	if err != nil {
+		logger.Error(err, "Kai-scheduler detection failed, could not create discovery client")
+		return false
+	}
+
+	// Check if scheduling.run.ai API group is available
+	apiGroups, err := discoveryClient.ServerGroups()
+	if err != nil {
+		logger.Error(err, "Kai-scheduler detection failed, could not list server groups")
+		return false
+	}
+
+	for _, group := range apiGroups.Groups {
+		if group.Name == "scheduling.run.ai" {
+			logger.Info("Kai-scheduler is available, scheduling.run.ai API group found")
+			return true
+		}
+	}
+
+	logger.Info("Kai-scheduler not available, scheduling.run.ai API group not found")
 	return false
 }
 

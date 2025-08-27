@@ -54,6 +54,12 @@ const (
 	DefaultSharedMemoryMountPath = "/dev/shm"
 	DefaultSharedMemorySize      = "8Gi"
 
+	// Kai-scheduler related constants
+	KubeAnnotationKaiSchedulerQueue = "nvidia.com/kai-scheduler-queue" // User-provided annotation to specify queue name
+	KubeLabelKaiSchedulerQueue      = "kai.scheduler/queue"            // Label injected into pods for kai-scheduler
+	KaiSchedulerName                = "kai-scheduler"                  // Scheduler name for kai-scheduler
+	DefaultKaiSchedulerQueue        = "main"                           // Default queue name when none specified
+
 	// Grove multinode role suffixes
 	GroveRoleSuffixLeader = "ldr"
 	GroveRoleSuffixWorker = "wkr"
