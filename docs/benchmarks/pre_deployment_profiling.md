@@ -88,7 +88,37 @@ python3 deploy/utils/inject_manifest.py \
 export DOCKER_IMAGE=nvcr.io/nvidia/dynamo:latest-vllm
 ```
 
-Why this approach?
+**Step 1: Configure container image**
+
+You have two options for configuring your profiling setup:
+
+**Option A: Use pre-built image with custom config injection (recommended)**
+
+Use the default pre-built image and inject custom configurations via PVC:
+
+1. **Set the container image:**
+   ```bash
+   export DOCKER_IMAGE=nvcr.io/nvidia/ai-dynamo/vllm-runtime:0.4.1 # or any existing image tag
+   ```
+
+2. **Inject your custom disagg configuration:**
+   ```bash
+   # Use default disagg.yaml config
+   python3 benchmarks/profiler/inject_disagg_config.py --namespace $NAMESPACE
+
+   # Or use a custom disagg config file
+   python3 benchmarks/profiler/inject_disagg_config.py --namespace $NAMESPACE --disagg-config my-custom-disagg.yaml
+
+   # Or specify a custom target path in the PVC
+   python3 benchmarks/profiler/inject_disagg_config.py --namespace $NAMESPACE --target-path /profiling_results/my-disagg.yaml
+   ```
+
+3. **Set the config path for the profiling job:**
+   ```bash
+   export DGD_CONFIG_FILE=/workspace/profiling_results/disagg.yaml # or your custom path
+   ```
+
+This approach allows you to:
 - Customize DGD configurations without rebuilding container images
 - Test different model configurations easily
 - Version control your DGD configs alongside your code
